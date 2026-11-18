@@ -10,7 +10,7 @@ Campus Stores is a Product Engineer work sample set at a fictional campus media 
 
 ![The shift with the change: partial return, handover check, recording who has the adapter, the wrong tag refused, the right slip closed](docs/walkthrough/shift.gif)
 
-**My decision:** keep the issue side as it is. Change one thing on the return side: when a unit stays out, who has it and when it's due back get recorded **on its slip**, and a slip is closed by reading the tag on the unit in hand.
+**My decision:** keep the issue side as it is. Change one thing on the return side: the record of who has a unit stays **on its slip**. That record carries from the partial return, through the handover, to the next shift, and the slip only closes against the tag on the unit in hand.
 
 To try it, open the [live demo](https://cyberrik.github.io/campus-stores/) or `index.html`, and play the shift with the time button: pickup → *Move to return time* → *Move to next morning*. The change is in **Loan register**.
 
@@ -49,13 +49,9 @@ If I had skipped that step and tried to end the shift, the register would have a
 
 ![Before you hand over](docs/walkthrough/5-handover-check.png)
 
-I clicked *Record who has AD-12*, chose Leela Das and Sat 9 am, and added what Kabir said:
+I clicked *Record who has AD-12*, chose Leela Das and Sat 9 am, and added what Kabir said. Saving it also posts the line to the [Desk book](docs/walkthrough/10-deskbook.png).
 
 ![Recording who has it](docs/walkthrough/4-custody-form.png)
-
-Saving the slip also writes the Desk book entry:
-
-![Desk book](docs/walkthrough/10-deskbook.png)
 
 **Sat 9:00 am.** I've just taken over. Start of shift tells me L-404 is with Leela and due now, that Tara's microphone is due within the hour, and that last night Kabir handed the adapter to Leela and the projector and speaker came back.
 
@@ -92,31 +88,27 @@ I left the issue form alone. Picking the same four fields three times for one ki
 
 The tag check helps only if the person on shift reads the label. Typing a tag is weaker than scanning one. A USB barcode scanner types into the same field, which would close that gap. Recording who has a unit is asked for at handover, not enforced. *Hand over anyway* is there because the counter, not the software, knows when the shift ends.
 
-### Tests
-
-`tests/` plays the whole shift in a headless browser and checks it. It also runs axe-core accessibility checks on each screen and checks text contrast in both themes. CI runs it on every push. Run `cd tests && npm install && npm test`. The app itself still needs no install.
-
 ### One observation at a real counter
 
 > When someone returns a unit for a borrower who isn't named on the slip, does the person on shift look at the unit's label before typing or scanning the tag?
 
 If they type from memory or copy it from the screen instead, the change hasn't helped.
 
-### Why I think this applies beyond a campus desk
-
-In a 2021 study of about 18,000 shared infusion pumps across 27 hospitals in British Columbia, about 4% of the fleet was consistently misplaced across sites, and about 5% hadn't been seen on the network for over three months. The main cause was pumps moving with patients between units and hospitals without being sent back ([Cesconetto & Rose, CMBES 2021](https://proceedings.cmbes.ca/index.php/proceedings/article/download/968/877/2028)). That's the adapter problem: the unit moved and the record didn't. I'd check whether a multi-site hospital group sees the same before assuming it does.
-
 ### If this were a ward equipment pool
 
-The core of the change would carry over:
+A 2021 study of about 18,000 shared infusion pumps across 27 hospitals in British Columbia found two problems:
+- About 4% of the fleet was consistently misplaced across sites.
+- About 5% hadn't been seen on the network for over three months.
+
+The main cause was pumps moving with patients and not being sent back ([Cesconetto & Rose, CMBES 2021](https://proceedings.cmbes.ca/index.php/proceedings/article/download/968/877/2028)). That's the adapter problem: the unit moved and the record didn't.
+
+So the core of this change would carry over to a ward pool:
 - who has a unit, recorded on the slip
-- slips closed by reading the tag on the unit in hand
-- a check before handing over
-- a start-of-shift view of what's overdue and what changed
+- closing by tag
+- the handover check
+- the start-of-shift view
 
-On wards, equipment moves with patients, not with the person who borrowed it. Nursing shift change is a likely point for knowledge of where something went to get lost.
-
-Some things would need to be different:
+These things would need to be different:
 
 - Scanning the tag would be the only way to close or transfer a record. A campus desk can live with typed tags; a ward can't.
 - The receiving ward or person would confirm a handover, not just the sender recording it.
@@ -125,6 +117,10 @@ Some things would need to be different:
 - Location would be ward and bed, with the person second.
 
 Before building any of this, I'd spend time in the biomedical engineering store and on a ward at shift change to see how equipment actually moves today.
+
+### Tests
+
+`tests/` plays the whole shift in a headless browser and checks it. It also runs axe-core accessibility checks on each screen and checks text contrast in both themes. CI runs it on every push. Run `cd tests && npm install && npm test`. The app itself still needs no install.
 
 ---
 
