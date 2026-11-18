@@ -26,6 +26,8 @@ Kabir returned the projector and speaker and said Leela had the adapter and woul
 
 The next morning shows why this matters. The new person on shift sees L-404 under Kabir's name, due last night, with no sign that it's late. Then Leela, whose name isn't on any slip, hands over "an adapter". Two identical adapters (AD-12 and AD-15) share bin C4, and *Record return* closes a slip in one click without asking which unit is on the counter.
 
+I've been on the other side of this. I borrowed a board game from our college games room and left my ID card at the desk. A friend returned it for me, and the person at the desk couldn't tell it was my loan coming back, or whether my ID card should go to my friend. The record had my name and nothing about the handover. That's why my change keeps both names: *collected by* is who signed for the item and gets the ID card back, and *now held by* is who to chase today.
+
 ### The change
 
 1. **Who has it, on the slip.** After each check-in, the register lists anything from the same request that's still out, with a button such as *Record who has AD-12*. Every open row also has *Change holder*. You record the new holder, the new due time and, optionally, what you were told. The slip then reads *With Leela Das (collected by Kabir Sen) · Due Sat 9 am* and keeps a dated history line. The same line is posted to the Desk book.
