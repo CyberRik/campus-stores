@@ -6,9 +6,13 @@ Campus Stores is a Product Engineer work sample set at a fictional campus media 
 
 ## For reviewers
 
+[![Tests](https://github.com/CyberRik/campus-stores/actions/workflows/tests.yml/badge.svg)](https://github.com/CyberRik/campus-stores/actions/workflows/tests.yml) · **[Try it live](https://cyberrik.github.io/campus-stores/)**
+
+![The shift with the change: partial return, handover check, recording who has the adapter, the wrong tag refused, the right slip closed](docs/walkthrough/shift.gif)
+
 **My decision:** keep the issue side as it is. Change one thing on the return side: when a unit stays out, who has it and when it's due back get recorded **on its slip**, and a slip is closed by reading the tag on the unit in hand.
 
-To try it, open `index.html` and play the shift with the time button: pickup → *Move to return time* → *Move to next morning*. The change is in **Loan register**.
+To try it, open the [live demo](https://cyberrik.github.io/campus-stores/) or `index.html`, and play the shift with the time button: pickup → *Move to return time* → *Move to next morning*. The change is in **Loan register**.
 
 ### A moment the product handles well: issuing at 3:45 pm
 
@@ -89,7 +93,7 @@ The tag check helps only if the person on shift reads the label. Typing a tag is
 
 ### Tests
 
-`tests/` plays the whole shift in a headless browser and checks it. Run `cd tests && npm install && npm test`. The app itself still needs no install.
+`tests/` plays the whole shift in a headless browser and checks it. It also runs axe-core accessibility checks on each screen and checks text contrast in both themes. CI runs it on every push. Run `cd tests && npm install && npm test`. The app itself still needs no install.
 
 ### One observation at a real counter
 
