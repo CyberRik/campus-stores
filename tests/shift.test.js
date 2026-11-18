@@ -336,6 +336,94 @@ describe("Handing over the shift", () => {
   });
 });
 
+describe("Start of shift", () => {
+  const strip = (t) => t.$("section.brief");
+  const text = (el) => (el ? el.textContent.replace(/\s+/g, " ") : "");
+  const part = (t, key) => text(t.$(`[data-brief-${key}]`));
+
+  it("is hidden at pickup and at return time", () => {
+    assert.equal(strip(playTo("pickup")), null);
+    assert.equal(strip(playTo("custody")), null);
+  });
+
+  it("lists L-404 as needing attention, with a pre-scoped Return…", () => {
+    const t = playTo("morning");
+    assert.equal(t.$('#brief-title').textContent, "Start of shift");
+    assert.equal(strip(t).getAttribute("aria-labelledby"), "brief-title");
+    assert.match(
+      part(t, "now"),
+      /L-404 · AD-12 · USB-C → HDMI adapter — With Leela Das \(collected by Kabir Sen\) · Due Sat 9 am Due now/,
+    );
+    const b = t.$('[data-brief-now] [data-action="checkin"]');
+    assert.equal(b.dataset.val, "404");
+    b.click();
+    assert.match(t.page(), /Expecting AD-12 for slip L-404/);
+  });
+
+  it("shows the custody change and what came back last shift", () => {
+    const since = part(playTo("morning"), "since");
+    assert.match(since, /L-404 · AD-12: Kabir Sen → Leela Das · due Fri 8 pm → Sat 9 am/);
+    assert.match(since, /RQ-214 Film Society: PR-04, SP-02 back Fri 7:30 pm/);
+  });
+
+  it("lists MI-09 as due within the hour, not as needing attention", () => {
+    const t = playTo("morning");
+    assert.match(part(t, "soon"), /L-401 · MI-09: With Tara Shah · Due Sat 10 am/);
+    assert.doesNotMatch(part(t, "now"), /MI-09/);
+  });
+
+  it("drops L-404 from needs-attention once AD-12 is checked in", () => {
+    const t = playTo("allBack");
+    assert.ok(strip(t));
+    assert.doesNotMatch(part(t, "now"), /L-404/);
+    assert.doesNotMatch(text(strip(t)), /Leela Das/);
+    assert.match(part(t, "soon"), /MI-09/);
+  });
+
+  it("shows one calm line when nothing is due and nothing changed", () => {
+    const t = playTo("pickup");
+    t.act("checkin", "");
+    for (const [tag, num] of [["PR-04", "402"], ["SP-02", "403"], ["AD-12", "404"], ["MI-09", "401"]])
+      returnTag(t, tag, num);
+    t.act("advance");
+    t.act("advance");
+    t.act("tab", "Loan register");
+    assert.equal(t.$(".brief .calm").textContent, "Nothing overdue and no changes since the last shift.");
+    assert.equal(t.$("[data-brief-now], [data-brief-soon], [data-brief-since]"), null);
+  });
+
+  it("Got it collapses to a summary that survives a tab change; Show expands", () => {
+    const t = playTo("morning");
+    t.act("briefed");
+    assert.equal(t.focused(), t.$('[data-action="unbrief"]'));
+    assert.equal(t.$("[data-brief-now]"), null);
+    assert.match(text(strip(t)), /Start of shift ?1 due now · 1 due within 1 h · 1 change since last shift/);
+    t.act("tab", "Desk book");
+    t.act("tab", "Loan register");
+    assert.ok(t.$('[data-action="unbrief"]'));
+    assert.ok(boot(t.saved()).$("section.brief.collapsed"), "collapse persists across reload");
+    t.act("unbrief");
+    assert.ok(t.$("[data-brief-now]"));
+    assert.equal(t.focused(), t.$('[data-action="briefed"]'));
+  });
+
+  it("Restart clears the acknowledgement", () => {
+    const t = playTo("morning");
+    t.act("briefed");
+    t.act("restart");
+    assert.equal(JSON.parse(t.saved()).briefed, null);
+  });
+
+  it("rejects a malformed saved briefed value", () => {
+    const saved = JSON.parse(playTo("morning").saved());
+    const clock = (t) => t.$("[data-clock]").textContent;
+    for (const bad of ["2", 7, -1, 1.5, true])
+      assert.match(clock(boot({ ...saved, briefed: bad })), /Friday · 3:45 pm/, String(bad));
+    assert.match(clock(boot({ ...saved, briefed: 2 })), /Saturday/);
+    assert.match(clock(boot({ ...saved, briefed: 0 })), /Saturday/);
+  });
+});
+
 describe("Saved state", () => {
   it("restores the shift and tab after a reload", () => {
     const t = playTo("allBack");

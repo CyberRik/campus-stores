@@ -443,6 +443,85 @@ body > main {
   font-size: 12px;
   background: transparent;
 }
+#campus-stores .brief {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 14px;
+  padding: 11px 13px 12px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--sel);
+  border-radius: 8px;
+}
+#campus-stores .brief.urgent {
+  border-left-color: var(--mark);
+}
+#campus-stores .briefhead,
+#campus-stores .brief.collapsed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 10px;
+}
+#campus-stores .brief h4 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--quiet);
+}
+#campus-stores .brief ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 3px;
+}
+#campus-stores [data-brief-now] li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 10px;
+  background: var(--desk);
+  border-radius: 6px;
+  padding: 7px 9px;
+}
+#campus-stores [data-brief-now] .tag {
+  vertical-align: 1px;
+}
+#campus-stores .brief .quiet {
+  color: var(--quiet);
+}
+#campus-stores .brief .quiet b {
+  color: var(--ink);
+  font-weight: 600;
+}
+#campus-stores .brief .quiet small {
+  white-space: nowrap;
+}
+#campus-stores .brief.collapsed {
+  flex-wrap: nowrap;
+  padding: 7px 9px 7px 13px;
+}
+#campus-stores .brief button {
+  flex-shrink: 0;
+}
+#campus-stores .brief.collapsed div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 10px;
+}
+#campus-stores .brief.collapsed h3 {
+  font-size: 13px;
+}
+#campus-stores .brief.collapsed p {
+  color: var(--quiet);
+}
+#campus-stores .calm {
+  color: var(--oktxt);
+}
 @container (max-width:650px) {
   #campus-stores .shell {
     grid-template-columns: minmax(0, 1fr);
@@ -476,6 +555,10 @@ body > main {
   }
   #campus-stores .actions {
     justify-content: flex-start;
+  }
+  #campus-stores [data-brief-now] li {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
   }
 }
 @container (max-width:420px) {

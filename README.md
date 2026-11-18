@@ -31,6 +31,7 @@ The next morning shows why this matters. The new person on shift sees L-404 unde
 1. **Who has it, on the slip.** After each check-in, the register lists anything from the same request that's still out, with a button such as *Record who has AD-12*. Every open row also has *Change holder*. You record the new holder, the new due time and, optionally, what you were told. The slip then reads *With Leela Das (collected by Kabir Sen) · Due Sat 9 am* and keeps a dated history line. The same line is posted to the Desk book.
 2. **Close by tag.** *Take a return* asks for the tag on the unit in your hand and finds that unit's slip. A row's *Return…* button opens the same panel, already expecting that unit, and still asks for the tag. If you enter a tag that isn't on loan (AD-15), it's refused. The error names the open slip and who has it, not the tag. The register list still shows tags, though, so this only works if the label gets read. See Limits.
 3. **A check before handover.** If part of a kit came back during the shift and nobody recorded who has the rest, *Move to next morning* stops once and shows *Before you hand over: RQ-214 came back in part. L-404 · AD-12 still lists Kabir Sen, due Fri 8 pm.* The two buttons are *Record who has AD-12* and *Hand over anyway*.
+4. **Start of shift.** For the person taking over, the register opens with what needs attention now, what's due within the hour, and what changed since the last shift. All of it is built from the slips, so the morning shift doesn't have to read the Desk book first.
 
 So the morning shift can see what's late, slips are also flagged against desk time (*Overdue*, *Due now*, *Due within 1 h*). Small extras: the last return can be undone, and the Requests list shows how much of each kit is out.
 
@@ -56,7 +57,7 @@ Saving the slip also writes the Desk book entry:
 
 ![Desk book](docs/walkthrough/10-deskbook.png)
 
-**Sat 9:00 am.** In the register, L-404 is under Leela's name and flagged *Due now*. Tara's microphone, due at 10, is flagged separately.
+**Sat 9:00 am.** I've just taken over. Start of shift tells me L-404 is with Leela and due now, that Tara's microphone is due within the hour, and that last night Kabir handed the adapter to Leela and the projector and speaker came back.
 
 ![Morning register](docs/walkthrough/6-morning-register.png)
 
@@ -104,6 +105,26 @@ If they type from memory or copy it from the screen instead, the change hasn't h
 ### Why I think this applies beyond a campus desk
 
 In a 2021 study of about 18,000 shared infusion pumps across 27 hospitals in British Columbia, about 4% of the fleet was consistently misplaced across sites, and about 5% hadn't been seen on the network for over three months. The main cause was pumps moving with patients between units and hospitals without being sent back ([Cesconetto & Rose, CMBES 2021](https://proceedings.cmbes.ca/index.php/proceedings/article/download/968/877/2028)). That's the adapter problem: the unit moved and the record didn't. I'd check whether a multi-site hospital group sees the same before assuming it does.
+
+### If this were a ward equipment pool
+
+The core of the change would carry over:
+- who has a unit, recorded on the slip
+- slips closed by reading the tag on the unit in hand
+- a check before handing over
+- a start-of-shift view of what's overdue and what changed
+
+On wards, equipment moves with patients, not with the person who borrowed it. Nursing shift change is a likely point for knowledge of where something went to get lost.
+
+Some things would need to be different:
+
+- Scanning the tag would be the only way to close or transfer a record. A campus desk can live with typed tags; a ward can't.
+- The receiving ward or person would confirm a handover, not just the sender recording it.
+- A returned unit would go to "awaiting cleaning" and only become available once it's marked clean and ready for the next patient.
+- A unit past its maintenance or calibration date would be blocked from issue, the same way a unit in repair is excluded now.
+- Location would be ward and bed, with the person second.
+
+Before building any of this, I'd spend time in the biomedical engineering store and on a ward at shift change to see how equipment actually moves today.
 
 ---
 

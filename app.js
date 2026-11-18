@@ -83,6 +83,7 @@
       time: "Saturday · 9:00 am",
       short: "Sat 9:00 am",
       title: "Morning shift",
+      takeover: true,
       text: "You’ve just taken over. Leela walks in with an adapter. Work out what was outstanding from the screening and close the loan for the right item.",
     },
   ];
@@ -133,6 +134,8 @@
     lastReturn: 0,
     onlyOpen: true,
     handover: false,
+    // Phase whose start-of-shift strip was acknowledged with "Got it".
+    briefed: null,
     notice: "Sample shift · All records are fictional.",
   });
   let s = original();
@@ -513,6 +516,78 @@
       "</div></form>"
     );
   }
+  // Start of shift: what someone taking over needs in ten seconds, built from
+  // the slips so they don't have to read the Desk book first.
+  function startOfShift() {
+    const p = s.phase;
+    const open = s.loans.filter((l) => !l.back);
+    const due = (kind) => open.filter((l) => (timing(l) || [])[1] === kind);
+    const now = due("late");
+    const soon = due("soon");
+    // Custody changes logged before this shift, on slips that are still open.
+    const changes = open.flatMap((l) =>
+      l.log.filter((e) => e.phase < p).map((e) => [l, e]),
+    );
+    // Units checked in during the previous shift, grouped by request.
+    const back = requests
+      .map((r) => [r, s.loans.filter((l) => l.req === r.id && l.backPhase === p - 1)])
+      .filter(([, list]) => list.length);
+    const unit = (l) => "L-" + l.num + " · " + l.asset;
+    const counts = [
+      [now.filter((l) => timing(l)[0] === "Overdue").length, "overdue"],
+      [now.filter((l) => timing(l)[0] === "Due now").length, "due now"],
+      [soon.length, "due within 1 h"],
+      [changes.length, (changes.length === 1 ? "change" : "changes") + " since last shift"],
+    ]
+      .filter(([n]) => n)
+      .map(([n, t]) => n + " " + t);
+    const title = '<h3 id="brief-title">Start of shift</h3>';
+    const wrap = (cls, body) =>
+      '<section class="brief' + cls + '" aria-labelledby="brief-title">' +
+      body +
+      "</section>";
+    if (s.briefed === p)
+      return wrap(
+        " collapsed",
+        "<div>" + title + "<p>" +
+          esc(counts.join(" · ") || "Nothing overdue, no changes") +
+          "</p></div>" +
+          btn("Show", "unbrief", "", "", "Show start of shift"),
+      );
+    const part = (key, heading, items, cls = "") =>
+      items.length
+        ? "<div data-brief-" + key + "><h4>" + heading + '</h4><ul class="' +
+          cls + '">' + items.join("") + "</ul></div>"
+        : "";
+    const line = (label, text, when = "") =>
+      "<li><b>" + esc(label) + ":</b> " + esc(text) +
+      (when ? " <small>" + esc(when) + "</small>" : "") + "</li>";
+    const body =
+      part("now", "Needs attention now", now.map((l) =>
+        "<li><span><b>" + esc(unit(l) + " · " + getAsset(l.asset).type) +
+          "</b> — " + esc(custodyText(l)) + " " + flag(l) + "</span>" +
+          btn("Return…", "checkin", String(l.num), "primary",
+            "Take return of " + l.asset + " (L-" + l.num + "), " +
+              timing(l)[0].toLowerCase()) +
+          "</li>",
+      )) +
+      part("soon", "Due within the hour",
+        soon.map((l) => line(unit(l), custodyText(l))), "quiet") +
+      part("since", "Since the last shift", [
+        ...changes.map(([l, e]) => line(unit(l), e.text, shifts[e.phase].short)),
+        ...back.map(([r, list]) =>
+          line(r.id + " " + r.club, list.map((l) => l.asset).join(", ") + " back",
+            shifts[p - 1].short)),
+      ], "quiet");
+    return wrap(
+      now.length ? " urgent" : "",
+      '<div class="briefhead">' + title +
+        btn("Got it", "briefed", "", "", "Got it, collapse start of shift") +
+        "</div>" +
+        (body ||
+          '<p class="calm">Nothing overdue and no changes since the last shift.</p>'),
+    );
+  }
   function register() {
     const open = s.loans.filter((l) => !l.back);
     const late = open.filter((l) => (timing(l) || [])[1] === "late").length;
@@ -557,11 +632,12 @@
         '</div><button type="submit" class="primary">Save issue slip</button></form>'
       );
     }
-    if (s.mode === "return") html += returnPanel();
     if (s.mode === "custody") {
       const l = getLoan(s.custody);
       if (l && !l.back) return html + custodyPanel(l);
     }
+    if (shifts[s.phase].takeover) html += startOfShift();
+    if (s.mode === "return") html += returnPanel();
     html +=
       '<div class="buttons">' +
       ["Outstanding", "All slips"]
@@ -783,6 +859,14 @@
       case "cancel":
         s.mode = "";
         focusSel = v ? returnBtnSel(v) : '[data-action="checkin"]';
+        break;
+      case "briefed":
+        s.briefed = s.phase;
+        focusSel = '[data-action="unbrief"]';
+        break;
+      case "unbrief":
+        s.briefed = null;
+        focusSel = '[data-action="briefed"]';
         break;
       case "scope":
         s.onlyOpen = v === "0";
@@ -1050,6 +1134,7 @@
       (d.selected && !getReq(d.selected)) ||
       !str(d.after) ||
       ![undefined, true, false].includes(d.handover) ||
+      !(d.briefed === undefined || d.briefed === null || isPhase(d.briefed)) ||
       (d.after && !getReq(d.after)) ||
       ![d.tag, d.findMsg, d.notice].every(str) ||
       ![d.custody, d.expect, d.found, d.lastReturn].every(int) ||

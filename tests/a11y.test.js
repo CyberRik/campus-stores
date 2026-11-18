@@ -59,6 +59,16 @@ const partial = () => {
   return t;
 };
 
+// Saturday morning on the register, after recording who has AD-12.
+const morning = () => {
+  const t = partial();
+  t.act("custody", "404");
+  t.submit("[data-custody]", { holder: "Leela Das", due: "Sat 9 am", said: "" });
+  t.act("advance");
+  t.act("tab", "Loan register");
+  return t;
+};
+
 // jsdom does no layout or painting, so axe cannot compute colours: color-contrast is off here
 // and covered by the token checks below. Every other rule (including 'region') stays on.
 const axeOptions = { rules: { "color-contrast": { enabled: false } } };
@@ -110,6 +120,22 @@ const states = {
     const t = partial();
     t.act("advance");
     assert.ok(t.$("[data-handover]").textContent.includes("Before you hand over"));
+    return t;
+  },
+  "Start of shift strip (Saturday)": () => {
+    const t = morning();
+    assert.ok(t.$("section.brief [data-brief-now]"));
+    return t;
+  },
+  "Start of shift collapsed": () => {
+    const t = morning();
+    t.act("briefed");
+    assert.ok(t.$("section.brief.collapsed"));
+    return t;
+  },
+  "Start of shift with a return open": () => {
+    const t = morning();
+    t.act("checkin", "404");
     return t;
   },
   "Desk book": () => {
