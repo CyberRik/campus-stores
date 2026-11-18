@@ -24,13 +24,11 @@ The next morning shows why this matters. The new person on shift sees L-404 unde
 
 ### The change
 
-1. **Who has it, on the slip.** After each check-in, the register lists anything from the same request that's still out, with a *Record who has it* button. You record the new holder, the new due time and, optionally, what you were told. The slip then reads *With Leela Das (collected by Kabir Sen) · Due Sat 9 am* and keeps a dated history line. The same line is posted to the Desk book.
-2. **Close by tag.** *Take a return* asks for the tag on the unit in your hand and finds that unit's slip. A row's *Return…* button opens the same panel, already expecting that unit, and still asks for the tag. If you enter a tag that isn't on loan (AD-15), it's refused. The message says how many units of that type are out and with whom, but not their tags, so the person on shift has to read the label rather than copy the answer off the screen.
+1. **Who has it, on the slip.** After each check-in, the register lists anything from the same request that's still out, with a button such as *Record who has AD-12*. Every open row also has *Change holder*. You record the new holder, the new due time and, optionally, what you were told. The slip then reads *With Leela Das (collected by Kabir Sen) · Due Sat 9 am* and keeps a dated history line. The same line is posted to the Desk book.
+2. **Close by tag.** *Take a return* asks for the tag on the unit in your hand and finds that unit's slip. A row's *Return…* button opens the same panel, already expecting that unit, and still asks for the tag. If you enter a tag that isn't on loan (AD-15), it's refused. The error names the open slip and who has it, not the tag. The register list still shows tags, though, so this only works if the label gets read. See Limits.
+3. **A check before handover.** If part of a kit came back during the shift and nobody recorded who has the rest, *Move to next morning* stops once and shows *Before you hand over: RQ-214 came back in part. L-404 · AD-12 still lists Kabir Sen, due Fri 8 pm.* The two buttons are *Record who has AD-12* and *Hand over anyway*.
 
-Smaller supporting pieces:
-- Slips are flagged against desk time (*Overdue*, *Due now*, *Due in < 1 h*).
-- The last return can be undone.
-- The Requests list shows how much of each kit is out.
+So the morning shift can see what's late, slips are also flagged against desk time (*Overdue*, *Due now*, *Due within 1 h*). Small extras: the last return can be undone, and the Requests list shows how much of each kit is out.
 
 ### Walkthrough: the same job with the change
 
@@ -42,11 +40,15 @@ Smaller supporting pieces:
 
 ![Kit remainder](docs/walkthrough/3-kit-remainder.png)
 
+If I had skipped that step and tried to end the shift, the register would have asked first:
+
+![Before you hand over](docs/walkthrough/5-handover-check.png)
+
 I clicked *Record who has AD-12*, chose Leela Das and Sat 9 am, and added what Kabir said:
 
 ![Recording who has it](docs/walkthrough/4-custody-form.png)
 
-The Desk book entry is written from the slip:
+Saving the slip also writes the Desk book entry:
 
 ![Desk book](docs/walkthrough/10-deskbook.png)
 
@@ -74,17 +76,30 @@ When the tag reads AD-12, the register shows L-404 with its history, and I close
 
 I left the issue form alone. Picking the same four fields three times for one kit is slow, but nothing gets lost there.
 
+### What I considered and rejected
+
+- **Block time from moving forward until the missing unit is recorded.** A desk can't stop a shift ending. Instead the register asks once, at handover, and lets you go on.
+- **Reassign the slip to Leela.** This loses the fact that Kabir collected the unit. If something goes wrong later, the desk needs both names.
+- **Close Kabir's slip and open a new one for Leela.** The unit never came back to the desk, so a new slip would record a pickup that never happened. It would also split one loan's history across two slips.
+- **Choose the returned unit from a dropdown.** That's the same guess as clicking a row, just in a different control. Only the label on the unit says which adapter it is.
+
 ### Limits
 
-The tag check helps only if the person on shift reads the label. Typing a tag is weaker than scanning one. A USB barcode scanner types into the same field, which would close that gap. Recording who has a unit is prompted, not enforced. You can still move time forward without doing it.
+The tag check helps only if the person on shift reads the label. Typing a tag is weaker than scanning one. A USB barcode scanner types into the same field, which would close that gap. Recording who has a unit is asked for at handover, not enforced. *Hand over anyway* is there because the counter, not the software, knows when the shift ends.
+
+### Tests
+
+`tests/` plays the whole shift in a headless browser and checks it. Run `cd tests && npm install && npm test`. The app itself still needs no install.
 
 ### One observation at a real counter
 
 > When someone returns a unit for a borrower who isn't named on the slip, does the person on shift look at the unit's label before typing or scanning the tag?
 
-If they type from memory or from the screen instead, the change hasn't helped, however it looks.
+If they type from memory or copy it from the screen instead, the change hasn't helped.
 
-*A note on the client:* I'd expect a hospital's shared equipment pool, with pumps and monitors lent between wards and handed over at shift change, to run into the same problem. I haven't seen how Virinchi runs its pool, so I'd check that first.
+### Why I think this applies beyond a campus desk
+
+In a 2021 study of about 18,000 shared infusion pumps across 27 hospitals in British Columbia, about 4% of the fleet was consistently misplaced across sites, and about 5% hadn't been seen on the network for over three months. The main cause was pumps moving with patients between units and hospitals without being sent back ([Cesconetto & Rose, CMBES 2021](https://proceedings.cmbes.ca/index.php/proceedings/article/download/968/877/2028)). That's the adapter problem: the unit moved and the record didn't. I'd check whether a multi-site hospital group sees the same before assuming it does.
 
 ---
 
@@ -106,6 +121,7 @@ Each browser stores its own sample shift locally when browser storage is availab
 - `app.js` contains the sample records and interactions.
 - `styles.css` defines the desktop and mobile layouts.
 - `docs/walkthrough/` holds the screenshots used above.
+- `tests/` holds the optional end-to-end test suite.
 
 Icon license notices are in [third-party/lucide-LICENSE.txt](third-party/lucide-LICENSE.txt).
 

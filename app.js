@@ -132,6 +132,7 @@
     after: "",
     lastReturn: 0,
     onlyOpen: true,
+    handover: false,
     notice: "Sample shift · All records are fictional.",
   });
   let s = original();
@@ -219,7 +220,7 @@
     const left = dueMinutes[l.due] - deskMinutes[s.phase];
     if (left < 0) return ["Overdue", "late"];
     if (left === 0) return ["Due now", "late"];
-    if (left <= 60) return ["Due in < 1 h", "soon"];
+    if (left <= 60) return ["Due within 1 h", "soon"];
     return null;
   }
   const flag = (l) => {
@@ -237,6 +238,45 @@
     const r = getReq(l.req);
     return r.id + " · " + r.club + " · " + custodyText(l);
   };
+  // A slip goes stale when part of its kit came back this shift but nobody
+  // recorded who still has it. Checked once, softly, before the handover.
+  const stale = () =>
+    s.loans.filter(
+      (l) =>
+        !l.back &&
+        !l.log.some((e) => e.phase === s.phase) &&
+        s.loans.some(
+          (o) => o.req === l.req && o.back && o.backPhase === s.phase,
+        ),
+    );
+  function handoverCheck(list) {
+    const reqs = [...new Set(list.map((l) => l.req))];
+    return (
+      '<div role="alert"><b>Before you hand over</b><p>' +
+      reqs
+        .map(
+          (r) =>
+            esc(r) +
+            " came back in part. " +
+            list
+              .filter((l) => l.req === r)
+              .map((l) =>
+                esc(
+                  "L-" + l.num + " · " + l.asset + " still lists " +
+                    holder(l) + ", due " + l.due + ".",
+                ),
+              )
+              .join(" "),
+        )
+        .join(" ") +
+      '</p></div><div class="buttons">' +
+      list
+        .map((l) => btn("Record who has " + l.asset, "custody", String(l.num)))
+        .join("") +
+      btn("Hand over anyway", "handover") +
+      "</div>"
+    );
+  }
   const returnBtnSel = (num) =>
     '[data-action="checkin"][data-val="' + num + '"]';
 
@@ -623,8 +663,24 @@
     q("[data-shift-title]").textContent = phase.title;
     q("[data-shift]").textContent = phase.text;
     const advance = q('[data-action="advance"]');
-    advance.hidden = !phase.next;
+    const stuck = stale();
+    if (!stuck.length) s.handover = false;
+    advance.hidden = !phase.next || s.handover;
     advance.textContent = phase.next || "";
+    let check = q("[data-handover]");
+    if (!check) {
+      check = document.createElement("div");
+      check.className = "handover";
+      check.dataset.handover = "";
+      advance.before(check);
+    }
+    check.hidden = !s.handover;
+    // Rewrite only on change so the alert isn't re-announced on every repaint.
+    const checkHtml = s.handover ? handoverCheck(stuck) : "";
+    if (check.dataset.html !== checkHtml) {
+      check.innerHTML = checkHtml;
+      check.dataset.html = checkHtml;
+    }
     q("[data-nav]").innerHTML = pages
       .map(
         ([n, icon]) =>
@@ -692,6 +748,15 @@
         s = original();
         break;
       case "advance":
+        if (!s.handover && stale().length) {
+          s.handover = true;
+          s.notice = "";
+          focusSel = "[data-handover] button";
+          break;
+        }
+      // falls through
+      case "handover":
+        s.handover = false;
         if (s.phase < 2) s.phase++;
         s.mode = "";
         s.lastReturn = 0;
@@ -736,6 +801,7 @@
       case "custody": {
         const l = getLoan(v);
         if (!l || l.back) return;
+        s.tab = "Loan register";
         s.mode = "custody";
         s.custody = l.num;
         focusSel = '[name="holder"]';
@@ -777,7 +843,12 @@
         s.after = "";
         s.notice =
           "Return undone. Slip L-" + l.num + " for " + l.asset + " is open again.";
-        focusSel = s.mode === "return" ? tagInput : returnBtnSel(l.num);
+        focusSel =
+          s.mode === "return"
+            ? tagInput
+            : s.tab === "Loan register"
+              ? returnBtnSel(l.num)
+              : '[data-nav] [aria-pressed="true"]';
         break;
       }
     }
@@ -978,6 +1049,7 @@
       !str(d.selected) ||
       (d.selected && !getReq(d.selected)) ||
       !str(d.after) ||
+      ![undefined, true, false].includes(d.handover) ||
       (d.after && !getReq(d.after)) ||
       ![d.tag, d.findMsg, d.notice].every(str) ||
       ![d.custody, d.expect, d.found, d.lastReturn].every(int) ||
@@ -1022,6 +1094,9 @@
     s = {
       ...original(),
       ...d,
+      // The handover check is a prompt for this moment, not saved state:
+      // don't re-announce it on reload.
+      handover: false,
       loans: d.loans.map((l) => ({ ...l, log: l.log.map((e) => ({ ...e })) })),
       notes: d.notes.map((n) => ({ ...n })),
     };

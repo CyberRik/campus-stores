@@ -1,0 +1,12 @@
+{
+  "name": "campus-stores-tests",
+  "private": true,
+  "type": "commonjs",
+  "description": "Optional jsdom test suite for the Campus Stores work sample.",
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "jsdom": "24.1.3"
+  }
+}

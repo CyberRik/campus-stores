@@ -163,6 +163,28 @@ body > main {
   color: var(--memotxt);
   flex-shrink: 0;
 }
+#campus-stores .shift {
+  flex-wrap: wrap;
+}
+#campus-stores .shift .handover:not([hidden]) {
+  flex: 1 1 100%;
+  max-width: none;
+  display: grid;
+  gap: 8px;
+  border-left: 4px solid var(--mark);
+  padding: 4px 0 4px 12px;
+}
+#campus-stores .handover p {
+  margin: 2px 0 0;
+}
+#campus-stores .handover .buttons {
+  flex-wrap: wrap;
+}
+#campus-stores .handover [data-action="custody"] {
+  background: var(--mark);
+  border-color: var(--mark);
+  color: var(--inv);
+}
 #campus-stores button,
 #campus-stores select,
 #campus-stores input,
