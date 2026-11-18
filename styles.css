@@ -35,7 +35,7 @@ body > main {
   --line: light-dark(#d2dcdf, #475158);
   --memo: light-dark(#fff3d8, #3d3426);
   --memotxt: light-dark(#65491e, #ead4a5);
-  --mark: light-dark(#bd502f, #f2a585);
+  --mark: light-dark(#a8431f, #f2a585);
   --ok: light-dark(#e3f1e8, #2d4838);
   --oktxt: light-dark(#25523d, #bedac8);
   background: var(--paper);
@@ -309,6 +309,104 @@ body > main {
 #campus-stores textarea {
   resize: vertical;
 }
+#campus-stores .actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+}
+#campus-stores .tag.late {
+  background: var(--memo);
+  color: var(--mark);
+  font-weight: 650;
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+#campus-stores .row strong + .tag {
+  margin-left: 8px;
+  vertical-align: 1px;
+}
+#campus-stores .expect {
+  margin: 0;
+}
+#campus-stores .okmsg {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+#campus-stores .tag.soon {
+  background: var(--memo);
+  color: var(--memotxt);
+}
+#campus-stores .panel {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 14px;
+  padding: 12px 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+#campus-stores .panel small {
+  display: block;
+  margin-top: 2px;
+}
+#campus-stores .panel .record {
+  margin-top: 0;
+}
+#campus-stores .panel .buttons {
+  margin: 8px 0 0;
+}
+#campus-stores .inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+}
+#campus-stores .inline label {
+  font-size: 13px;
+  font-weight: 600;
+}
+#campus-stores .inline input {
+  width: 12ch;
+  font-weight: 400;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+#campus-stores .inline input::placeholder {
+  text-transform: none;
+}
+#campus-stores .inline label span {
+  margin-bottom: 3px;
+}
+#campus-stores .warn span {
+  display: block;
+  font-weight: 400;
+  color: var(--ink);
+  margin-top: 2px;
+}
+#campus-stores .record.pending {
+  border-left-color: var(--mark);
+}
+#campus-stores .record ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+#campus-stores .log {
+  list-style: none;
+  padding-left: 0 !important;
+}
+#campus-stores .warn {
+  color: var(--mark);
+  font-weight: 600;
+}
+#campus-stores .okmsg {
+  background: var(--ok);
+  color: var(--oktxt);
+  padding: 8px 11px;
+  border-radius: 6px;
+}
 #campus-stores .statusbar {
   background: var(--desk);
   border-top: 1px solid var(--line);
@@ -350,6 +448,12 @@ body > main {
   #campus-stores .examstrip,
   #campus-stores .shift {
     padding: 9px 12px;
+  }
+  #campus-stores .row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #campus-stores .actions {
+    justify-content: flex-start;
   }
 }
 @container (max-width:420px) {
